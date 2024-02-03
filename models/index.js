@@ -1,20 +1,15 @@
-// import models
-const Product = require('./Product');
-const Category = require('./Category');
-const Tag = require('./Tag');
-const ProductTag = require('./ProductTag');
+import { Category } from './Category.js'
+import { Product } from './Product.js'
+import { Tag } from './Tag.js'
+import { ProductTag } from './ProductTag.js'
 
-// Products belongsTo Category
+Category.hasMany(Product, { foreignKey: 'category_id' })
+Product.belongsTo(Category, { foreignKey: 'category_id' })
 
-// Categories have many Products
+Product.belongsToMany(Tag, { through: ProductTag, foreignKey: 'product_id'})
+Tag.belongsToMany(Product, { through: ProductTag, foreignKey: 'tag_id'})
 
-// Products belongToMany Tags (through ProductTag)
+ProductTag.belongsTo(Product, { foreignKey: 'product_id' })
+ProductTag.belongsTo(Tag, { foreignKey: 'tag_id' })
 
-// Tags belongToMany Products (through ProductTag)
-
-module.exports = {
-  Product,
-  Category,
-  Tag,
-  ProductTag,
-};
+export { Category, Product, Tag, ProductTag }

@@ -1,4 +1,5 @@
-const { Category } = require('../models');
+import { Category } from '../models/Category.js'
+
 
 const categoryData = [
   {
@@ -16,8 +17,6 @@ const categoryData = [
   {
     category_name: 'Shoes',
   },
-];
+]
 
-const seedCategories = () => Category.bulkCreate(categoryData);
-
-module.exports = seedCategories;
+export const seedCategories = () => Category.bulkCreate(categoryData)

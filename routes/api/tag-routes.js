@@ -1,28 +1,64 @@
-const router = require('express').Router();
-const { Tag, Product, ProductTag } = require('../../models');
+import { Router } from 'express'
+import { Product } from '../../models/Product.js'
+import { Tag } from '../../models/Tag.js'
+import { ProductTag } from '../../models/ProductTag.js'
 
-// The `/api/tags` endpoint
+export const tagRoutes = Router()
 
-router.get('/', (req, res) => {
-  // find all tags
-  // be sure to include its associated Product data
-});
+tagRoutes.get('/', async (req, res) => {
+  try {
+    
+    const tagData = await ProductTag.findAll({include: [
+      {
+        model: Tag,
+        attributes: ['tag_name'],
+      },
+      {
+        model: Product,
+        attributes: ['product_name'],
+      },
+    ]})
 
-router.get('/:id', (req, res) => {
-  // find a single tag by its `id`
-  // be sure to include its associated Product data
-});
+    res.status(200).json(tagData)
 
-router.post('/', (req, res) => {
+  } catch (err) {
+
+    res.status(500).json(err.message)
+
+  }
+})
+
+tagRoutes.get('/:id', async (req, res) => {
+  try {
+    
+    const tagData = await ProductTag.findByPk(req.params.id, {include: [
+      {
+        model: Tag,
+        attributes: ['tag_name'],
+      },
+      {
+        model: Product,
+        attributes: ['product_name'],
+      },
+    ]})
+
+    res.status(200).json(tagData)
+
+  } catch (err) {
+
+    res.status(500).json(err.message)
+
+  }
+})
+
+tagRoutes.post('/', (req, res) => {
   // create a new tag
-});
+})
 
-router.put('/:id', (req, res) => {
+tagRoutes.put('/:id', (req, res) => {
   // update a tag's name by its `id` value
-});
+})
 
-router.delete('/:id', (req, res) => {
+tagRoutes.delete('/:id', (req, res) => {
   // delete on tag by its `id` value
-});
-
-module.exports = router;
+})
