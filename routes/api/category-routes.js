@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { Category } from '../../models/Category.js'
 import { Product } from '../../models/Product.js'
 import { ProductTag } from '../../models/ProductTag.js'
+import { Op } from 'sequelize'
 
 export const categoryRoutes = Router()
 
@@ -85,6 +86,22 @@ categoryRoutes.put('/:id', async (req, res) => {
 categoryRoutes.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
   try {
+    const idsForPairs = await Product.findAll({
+      where:{
+        category_id: req.params.id
+      }
+    })
+
+    const idsArray = idsForPairs.map(({ id }) => id)
+
+    await ProductTag.destroy({
+      where: {
+        product_id: {
+          [Op.in]: idsArray,
+        },
+      }
+    })
+
     await Product.destroy({
       where: {
         category_id: req.params.id
@@ -101,7 +118,7 @@ categoryRoutes.delete('/:id', async (req, res) => {
       return;
     }
 
-    res.status(200).json(`${deletedCategory} product deleted`)
+    res.status(200).json(`${deletedCategory} category deleted`)
 
   } catch (err) {
     console.log(err)
