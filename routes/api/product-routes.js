@@ -7,8 +7,8 @@ import { ProductTag } from '../../models/ProductTag.js'
 export const productRoutes = Router()
 
 productRoutes.get('/', async (req, res) => {
+  //Gets all products
   try {
-
     const productData = await Product.findAll({include: [
       {
         model: Category,
@@ -25,16 +25,14 @@ productRoutes.get('/', async (req, res) => {
     res.status(200).json(productData)
 
   } catch (err) {
-
-    res.status(500).json(err.message)
-
+    console.log(err)
+    res.status(500).json(err)
   }
 })
 
-// get one product
 productRoutes.get('/:id', async (req, res) => {
+  //Gets one product by ID
   try {
-
     const productData = await Product.findByPk(req.params.id, {include: [
       {
         model: Category,
@@ -48,25 +46,21 @@ productRoutes.get('/:id', async (req, res) => {
       },
     ]})
 
+    if (!productData) {
+      res.status(404).json({ message: 'No Product found with this id!' });
+      return;
+    }
+
     res.status(200).json(productData)
 
   } catch (err) {
-
-    res.status(500).json(err.message)
-
+    console.log(err)
+    res.status(500).json(err)
   }
 })
 
-// create new product
 productRoutes.post('/', (req, res) => {
-  /* req.body should look like this...
-    {
-      product_name: "Basketball",
-      price: 200.00,
-      stock: 3,
-      tagIds: [1, 2, 3, 4]
-    }
-  */
+  // create new product
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
@@ -134,7 +128,30 @@ productRoutes.put('/:id', (req, res) => {
     })
 })
 
-productRoutes.delete('/:id', (req, res) => {
+productRoutes.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
+  try {
+    await ProductTag.destroy({
+      where: {
+        product_id: req.params.id
+      }
+    })
+    const deletedProduct = await Product.destroy({
+      where: {
+        id: req.params.id
+      }
+    }) 
+
+    if (!deletedProduct) {
+      res.status(404).json({ message: 'No Product found with this id!' });
+      return;
+    }
+
+    res.status(200).json(`${deletedProduct} product deleted`)
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json(err)
+  }
 })
 
